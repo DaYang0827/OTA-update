@@ -2,6 +2,39 @@
 
 使用bootloader来实现主程序的就地升级更新，bootloader与PC上位机通过串口来收发指令。
 
+```mermaid
+ sequenceDiagram
+    autonumber
+    participant PC as PC
+    participant BOOT as BOOT
+
+    Note over PC, BOOT: 1. 查询版本
+    PC ->> BOOT: BL_OP_INQUIRY + BL_INQUIRY_VERSION
+    BOOT -->> PC: BL_OP_INQUIRY + {major} + {minor} (返回版本)
+
+    Note over PC, BOOT: 2. 查询 MTU
+    PC ->> BOOT: BL_OP_INQUIRY + BL_INQUIRY_MTU
+    BOOT -->> PC: BL_OP_INQUIRY + {mtu} (返回MTU)
+
+    Note over PC, BOOT: 3. 擦除 FLASH
+    PC ->> BOOT: BL_OP_ERASE + {addr} + {size}
+    BOOT -->> PC: BL_OP_ERASE + {err} (擦除结果)
+
+    Note over PC, BOOT: 4. 写固件到 FLASH (拆包循环)
+    rect rgb(240, 245, 255)
+        Note over PC, BOOT: 循环规则：<br/>1. 每次写入 data 长度不得超过 MTU 大小<br/>2. 固件总长度超过 MTU 大小需拆分<br/>3. 循环直到将固件写入完毕
+        PC ->> BOOT: BL_OP_WRITE + {addr} + {size} + {data}
+        BOOT -->> PC: BL_OP_WRITE + {err} (写FLASH结果)
+    end
+
+    Note over PC, BOOT: 5. 校验固件
+    PC ->> BOOT: BL_OP_VERIFY + {addr} + {size} + {crc}
+    BOOT -->> PC: BL_OP_VERIFY + {err} (校验结果)
+
+    Note over PC, BOOT: 6. 启动固件
+    PC ->> BOOT: BL_OP_BOOT
+    BOOT -->> PC: BL_OP_BOOT + {err} (启动结果)
+```
 # 2 协议格式
 
 ## 2.1 发送格式
