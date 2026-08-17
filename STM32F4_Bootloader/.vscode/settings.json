@@ -11,6 +11,6 @@
         "**/.hg": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
-        "mdk": true
+        "mdk": false
     }
 }

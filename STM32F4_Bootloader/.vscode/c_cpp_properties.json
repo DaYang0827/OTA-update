@@ -3,10 +3,14 @@
         {
             "name": "bootloader",
             "includePath": [
+                "app",
+                "driver",
+                "third_lib/crc",
+                "third_lib/easylogger",
+                "third_lib/ringbuffer",
                 "firmware/cmsis/core",
                 "firmware/cmsis/device",
-                "firmware/driver/inc",
-                "driver"
+                "firmware/driver/inc"
             ],
             "defines": [
                 "STM32F40_41xxx",
